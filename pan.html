@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>パンまつり計算表</title>
+    <style>
+        body { font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif; text-align: center; background-color: #fffaf0; color: #333; padding: 20px; }
+        h1 { color: #e60012; font-size: 1.5rem; margin-bottom: 20px; border-bottom: 2px solid #ff8c00; display: inline-block; padding-bottom: 5px; }
+        .card { background: white; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); padding: 20px; max-width: 350px; margin: 0 auto; }
+        .score-display { font-size: 2.5rem; color: #e60012; font-weight: bold; margin: 10px 0; }
+        .row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px dashed #ccc; }
+        .point-label { font-weight: bold; font-size: 1.1rem; width: 80px; text-align: left; }
+        select { padding: 8px; font-size: 1rem; border-radius: 5px; border: 1px solid #ff8c00; background: white; width: 100px; }
+        .result-area { margin-top: 20px; padding: 15px; background-color: #fff0e0; border-radius: 10px; }
+        .remain-text { font-size: 1.2rem; font-weight: bold; color: #d2691e; }
+        .reset-btn { background-color: #bbb; color: white; border: none; padding: 10px 30px; border-radius: 20px; margin-top: 20px; cursor: pointer; font-size: 0.9rem; }
+        .reset-btn:hover { background-color: #999; }
+    </style>
+</head>
+<body>
+
+    <h1>🍞 パンまつり計算表</h1>
+
+    <div class="card">
+        <div id="input-rows">
+            </div>
+
+        <div class="result-area">
+            <div>現在の合計点数</div>
+            <div class="score-display"><span id="total">0.0</span>点</div>
+            <div class="remain-text" id="remain-msg">30点まであと30.0点</div>
+        </div>
+
+        <button class="reset-btn" onclick="resetAll()">リセット</button>
+    </div>
+
+    <script>
+        const pointsList = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0];
+        const target = 30;
+
+        const container = document.getElementById('input-rows');
+        pointsList.forEach(p => {
+            const row = document.createElement('div');
+            row.className = 'row';
+            row.innerHTML = `
+                <span class="point-label">${p.toFixed(1)}点</span>
+                <select id="pt-${p}" onchange="calculate()">
+                    ${Array.from({length: 61}, (_, i) => `<option value="${i}">${i} 枚</option>`).join('')}
+                </select>
+            `;
+            container.appendChild(row);
+        });
+
+        function calculate() {
+            let total = 0;
+            pointsList.forEach(p => {
+                const count = parseInt(document.getElementById(`pt-${p}`).value);
+                total += p * count;
+            });
+
+            document.getElementById('total').innerText = total.toFixed(1);
+            
+            let remain = target - total;
+            const msgElement = document.getElementById('remain-msg');
+            if (remain > 0) {
+                msgElement.innerText = `30点まであと${remain.toFixed(1)}点`;
+                msgElement.style.color = "#d2691e";
+            } else {
+                msgElement.innerText = "30点達成！おめでとうございます！";
+                msgElement.style.color = "#e60012";
+            }
+        }
+
+        function resetAll() {
+            if(confirm("入力をすべてリセットしますか？")) {
+                pointsList.forEach(p => {
+                    document.getElementById(`pt-${p}`).value = 0;
+                });
+                calculate();
+            }
+        }
+    </script>
+</body>
+</html>
